@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LAYER 3: FREQUENCY ANALYSIS</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Courier New', monospace;
+        }
+        
+        body {
+            background: #0a0a0a;
+            color: #00ff00;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            padding: 20px;
+            border-bottom: 1px solid #00ff00;
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            font-size: 2rem;
+            text-shadow: 0 0 10px #00ff00;
+            margin-bottom: 10px;
+        }
+        
+        .terminal {
+            background: #111;
+            border: 1px solid #333;
+            border-radius: 5px;
+            padding: 20px;
+            margin: 20px auto;
+            max-width: 800px;
+        }
+        
+        .terminal-line {
+            margin: 10px 0;
+            color: #00ff00;
+        }
+        
+        .terminal-line.system {
+            color: #5555ff;
+        }
+        
+        .terminal-line.success {
+            color: #55ff55;
+        }
+        
+        .puzzle-container {
+            background: #1a1a1a;
+            border: 1px solid #00ff00;
+            padding: 30px;
+            margin: 30px auto;
+            max-width: 800px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .audio-container {
+            background: #222;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        
+        canvas {
+            width: 100%;
+            height: 200px;
+            background: #111;
+            border: 1px solid #00ff00;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        
+        .frequency-display {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px 0;
+            padding: 15px;
+            background: #222;
+            border-radius: 10px;
+        }
+        
+        .freq-box {
+            text-align: center;
+            padding: 10px;
+            background: #333;
+            border-radius: 5px;
+            min-width: 80px;
+        }
+        
+        .freq-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #ff55ff;
+        }
+        
+        input[type="range"] {
+            width: 100%;
+            margin: 15px 0;
+            -webkit-appearance: none;
+            height: 10px;
+            background: #333;
+            border-radius: 5px;
+            outline: none;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 25px;
+            height: 25px;
+            background: #00ff00;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        
+        button {
+            background: #003300;
+            color: #00ff00;
+            border: 1px solid #00ff00;
+            padding: 12px 24px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            margin: 10px;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+        
+        button:hover {
+            background: #005500;
+            box-shadow: 0 0 15px #00ff00;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .code-output {
+            background: #111;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 1.2rem;
+            color: #ff55ff;
+            margin: 20px 0;
+            letter-spacing: 2px;
+        }
+        
+        .github-link {
+            color: #5555ff;
+            text-decoration: none;
+            border-bottom: 1px dashed #5555ff;
+        }
+        
+        .github-link:hover {
+            color: #8888ff;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🎵 LAYER 3: FREQUENCY LOCK</h1>
+        <p>Neural Access Level: 3 | User: Listener</p>
+        <p>Coordinates: <span id="coordsDisplay">760, 430</span></p>
+    </div>
+    
+    <div class="terminal">
+        <div class="terminal-line system">> SYSTEM: Audio spectrum analysis required</div>
+        <div class="terminal-line">> TARGET FREQUENCIES: [440Hz, 880Hz, 1760Hz]</div>
+        <div class="terminal-line">> OBJECTIVE: Match the frequencies to unlock code</div>
+    </div>
+    
+    <div class="puzzle-container">
+        <h2>🎵 AUDIO FREQUENCY PUZZLE</h2>
+        <p>Tune the sliders to match the target frequencies</p>
+        
+        <div class="audio-container">
+            <!-- Frequency 1 -->
+            <div class="frequency-control">
+                <p>Frequency 1: <span id="freq1Value">440</span> Hz</p>
+                <input type="range" id="freq1Slider" min="20" max="2000" value="440" step="1">
+            </div>
+            
+            <!-- Frequency 2 -->
+            <div class="frequency-control">
+                <p>Frequency 2: <span id="freq2Value">880</span> Hz</p>
+                <input type="range" id="freq2Slider" min="20" max="2000" value="880" step="1">
+            </div>
+            
+            <!-- Frequency 3 -->
+            <div class="frequency-control">
+                <p>Frequency 3: <span id="freq3Value">1760</span> Hz</p>
+                <input type="range" id="freq3Slider" min="20" max="2000" value="1760" step="1">
+            </div>
+            
+            <canvas id="waveform"></canvas>
+            
+            <div class="frequency-display">
+                <div class="freq-box">
+                    <div class="freq-label">Target 1</div>
+                    <div class="freq-value">440</div>
+                    <div class="freq-status" id="status1">🔴</div>
+                </div>
+                <div class="freq-box">
+                    <div class="freq-label">Target 2</div>
+                    <div class="freq-value">880</div>
+                    <div class="freq-status" id="status2">🔴</div>
+                </div>
+                <div class="freq-box">
+                    <div class="freq-label">Target 3</div>
+                    <div class="freq-value">1760</div>
+                    <div class="freq-status" id="status3">🔴</div>
+                </div>
+            </div>
+            
+            <button id="testBtn">🔊 TEST FREQUENCIES</button>
+            <button id="checkBtn">🔓 CHECK SOLUTION</button>
+        </div>
+        
+        <div id="githubClue" class="hidden">
+            <h3>🔗 GITHUB CLUE</h3>
+            <p>Visit this GitHub repository for the next clue:</p>
+            <a href="https://github.com/neuro-arg/neuro-arg-2024" target="_blank" class="github-link">
+                https://github.com/neuro-arg/neuro-arg-2024
+            </a>
+            <p class="hint">💡 Look for the combined number from your coordinates</p>
+        </div>
+        
+        <div id="finalCode" class="hidden">
+            <h3>✅ FREQUENCY LOCK UNLOCKED!</h3>
+            <p>Secret code generated:</p>
+            <div class="code-output" id="secretOutput">NEURO-FINAL-██████</div>
+            <button onclick="revealFinalCode()">👁️ REVEAL FULL CODE</button>
+        </div>
+    </div>
+    
+    <div id="completionMessage" class="hidden">
+        <div class="puzzle-container" style="border-color: #ff55ff;">
+            <h2>🌟 ARG COMPLETE!</h2>
+            <div class="terminal-line success">> ALL LAYERS UNLOCKED</div>
+            <div class="terminal-line success">> FINAL CODE: NEURO-ARG-MASTER-2024</div>
+            <div class="terminal-line">> ACCESS GRANTED TO FINAL LEVEL</div>
+            
+            <p>Congratulations! You've completed the Neuro ARG prototype.</p>
+            <p>🎯 Next: Implement real eye tracking with TensorFlow.js</p>
+            <p>🎯 Next: Add actual EEG hardware integration</p>
+            <p>🎯 Next: Build community leaderboard</p>
+            
+            <button onclick="shareAchievement()">📢 SHARE ACHIEVEMENT</button>
+        </div>
+    </div>
+    
+    <script>
+        // Audio context for sound generation
+        let audioContext;
+        let oscillators = [];
+        
+        // Target frequencies
+        const targetFrequencies = [440, 880, 1760]; // A, A5, A6 notes
+        let userFrequencies = [440, 880, 1760];
+        
+        // DOM Elements
+        const freq1Slider = document.getElementById('freq1Slider');
+        const freq2Slider = document.getElementById('freq2Slider');
+        const freq3Slider = document.getElementById('freq3Slider');
+        const freq1Value = document.getElementById('freq1Value');
+        const freq2Value = document.getElementById('freq2Value');
+        const freq3Value = document.getElementById('freq3Value');
+        const status1 = document.getElementById('status1');
+        const status2 = document.getElementById('status2');
+        const status3 = document.getElementById('status3');
+        const testBtn = document.getElementById('testBtn');
+        const checkBtn = document.getElementById('checkBtn');
+        const githubClue = document.getElementById('githubClue');
+        const finalCode = document.getElementById('finalCode');
+        const completionMessage = document.getElementById('completionMessage');
+        const coordsDisplay = document.getElementById('coordsDisplay');
+        const canvas = document.getElementById('waveform');
+        const ctx = canvas.getContext('2d');
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get coordinates from localStorage
+            const coordsX = localStorage.getItem('neuroArgGazeX') || '760';
+            const coordsY = localStorage.getItem('neuroArgGazeY') || '430';
+            coordsDisplay.textContent = `${coordsX}, ${coordsY}`;
+            
+            // Setup canvas
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+            
+            // Initialize Audio Context
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            
+            // Setup slider events
+            setupSliders();
+            
+            // Setup buttons
+            testBtn.addEventListener('click', testFrequencies);
+            checkBtn.addEventListener('click', checkSolution);
+            
+            // Draw initial waveform
+            drawWaveform();
+            
+            addTerminalLog('Audio system initialized', 'system');
+            addTerminalLog('Frequency controls ready', 'system');
+        });
+        
+        // Setup sliders
+        function setupSliders() {
+            freq1Slider.addEventListener('input', function() {
+                freq1Value.textContent = this.value;
+                userFrequencies[0] = parseInt(this.value);
+                updateStatus();
+                drawWaveform();
+            });
+            
+            freq2Slider.addEventListener('input', function() {
+                freq2Value.textContent = this.value;
+                userFrequencies[1] = parseInt(this.value);
+                updateStatus();
+                drawWaveform();
+            });
+            
+            freq3Slider.addEventListener('input', function() {
+                freq3Value.textContent = this.value;
+                userFrequencies[2] = parseInt(this.value);
+                updateStatus();
+                drawWaveform();
+            });
+        }
+        
+        // Update status indicators
+        function updateStatus() {
+            const tolerance = 5; // Hz tolerance
+            
+            // Check each frequency
+            const check1 = Math.abs(userFrequencies[0] - targetFrequencies[0]) <= tolerance;
+            const check2 = Math.abs(userFrequencies[1] - targetFrequencies[1]) <= tolerance;
+            const check3 = Math.abs(userFrequencies[2] - targetFrequencies[2]) <= tolerance;
+            
+            status1.textContent = check1 ? '✅' : '🔴';
+            status2.textContent = check2 ? '✅' : '🔴';
+            status3.textContent = check3 ? '✅' : '🔴';
+            
+            return check1 && check2 && check3;
+        }
+        
+        // Draw waveform
+        function drawWaveform() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw grid
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 1;
+            
+            // Vertical lines
+            for (let x = 0; x < canvas.width; x += 50) {
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, canvas.height);
+                ctx.stroke();
+            }
+            
+            // Horizontal lines
+            for (let y = 0; y < canvas.height; y += 20) {
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(canvas.width, y);
+                ctx.stroke();
+            }
+            
+            // Draw combined waveform
+            ctx.strokeStyle = '#00ff00';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            
+            const points = 500;
+            for (let i = 0; i < points; i++) {
+                const x = (i / points) * canvas.width;
+                
+                // Combine all three frequencies
+                let y = 0;
+                y += Math.sin(i * userFrequencies[0] * 0.01) * 0.33;
+                y += Math.sin(i * userFrequencies[1] * 0.01) * 0.33;
+                y += Math.sin(i * userFrequencies[2] * 0.01) * 0.33;
+                
+                // Scale to canvas
+                const pixelY = (y + 1) * (canvas.height / 2);
+                
+                if (i === 0) {
+                    ctx.moveTo(x, pixelY);
+                } else {
+                    ctx.lineTo(x, pixelY);
+                }
+            }
+            
+            ctx.stroke();
+        }
+        
+        // Test frequencies with sound
+        function testFrequencies() {
+            stopAllSounds();
+            
+            // Create oscillators for each frequency
+            userFrequencies.forEach((freq, index) => {
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.value = freq;
+                oscillator.type = 'sine';
+                gainNode.gain.value = 0.1;
+                
+                oscillator.start();
+                oscillators.push({ oscillator, gainNode });
+                
+                // Visual feedback
+                const statusElement = document.getElementById(`status${index + 1}`);
+                statusElement.style.color = '#ffff55';
+                statusElement.textContent = '🔊';
+            });
+            
+            // Stop after 1 second
+            setTimeout(() => {
+                stopAllSounds();
+                updateStatus();
+            }, 1000);
+            
+            addTerminalLog(`Testing frequencies: ${userFrequencies.join(', ')} Hz`, 'system');
+        }
+        
+        // Stop all sounds
+        function stopAllSounds() {
+            oscillators.forEach(obj => {
+                obj.gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.1);
+                setTimeout(() => obj.oscillator.stop(), 100);
+            });
+            oscillators = [];
+        }
+        
+        // Check solution
+        function checkSolution() {
+            const allCorrect = updateStatus();
+            
+            if (allCorrect) {
+                addTerminalLog('All frequencies matched!', 'success');
+                addTerminalLog('Generating access code...', 'system');
+                
+                // Show GitHub clue
+                githubClue.classList.remove('hidden');
+                
+                // Generate code based on coordinates
+                const coordsX = localStorage.getItem('neuroArgGazeX') || '760';
+                const coordsY = localStorage.getItem('neuroArgGazeY') || '430';
+                const combined = coordsX + coordsY; // 760430
+                
+                // Show partial code
+                document.getElementById('secretOutput').textContent = 
+                    `NEURO-FINAL-${combined.substring(0, 3)}███`;
+                
+                finalCode.classList.remove('hidden');
+                
+            } else {
+                addTerminalLog('Frequencies not matched', 'error');
+                addTerminalLog('Adjust sliders to match targets', 'system');
+            }
+        }
+        
+        // Reveal final code
+        function revealFinalCode() {
+            const coordsX = localStorage.getItem('neuroArgGazeX') || '760';
+            const coordsY = localStorage.getItem('neuroArgGazeY') || '430';
+            const combined = coordsX + coordsY;
+            
+            document.getElementById('secretOutput').textContent = 
+                `NEURO-FINAL-${combined}`;
+            
+            // Show completion message after delay
+            setTimeout(() => {
+                finalCode.classList.add('hidden');
+                completionMessage.classList.remove('hidden');
+                
+                addTerminalLog('Final code revealed: NEURO-FINAL-' + combined, 'success');
+                addTerminalLog('ARG prototype completed!', 'success');
+            }, 2000);
+        }
+        
+        // Ganti fungsi di Layer 3 completion
+        function shareAchievement() {
+            // Redirect to completion page instead
+            window.location.href = 'completion.html';
+        }
+        
+        // Terminal log function
+        function addTerminalLog(message, type = '') {
+            const terminal = document.querySelector('.terminal');
+            const line = document.createElement('div');
+            line.className = `terminal-line ${type}`;
+            line.textContent = `> ${message}`;
+            terminal.appendChild(line);
+            terminal.scrollTop = terminal.scrollHeight;
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LAYER 1: THE CIPHER</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Courier New', monospace;
+        }
+        
+        body {
+            background: #0a0a0a;
+            color: #00ff00;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            padding: 20px;
+            border-bottom: 1px solid #00ff00;
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            font-size: 2rem;
+            text-shadow: 0 0 10px #00ff00;
+            margin-bottom: 10px;
+        }
+        
+        .terminal {
+            background: #111;
+            border: 1px solid #333;
+            border-radius: 5px;
+            padding: 20px;
+            margin: 20px auto;
+            max-width: 800px;
+            min-height: 300px;
+        }
+        
+        .terminal-line {
+            margin: 10px 0;
+            color: #00ff00;
+        }
+        
+        .terminal-line.system {
+            color: #5555ff;
+        }
+        
+        .terminal-line.success {
+            color: #55ff55;
+        }
+        
+        .puzzle-container {
+            background: #1a1a1a;
+            border: 1px solid #00ff00;
+            padding: 20px;
+            margin: 30px auto;
+            max-width: 600px;
+            border-radius: 10px;
+        }
+        
+        .cipher-text {
+            font-size: 1.2rem;
+            letter-spacing: 3px;
+            text-align: center;
+            margin: 20px 0;
+            padding: 15px;
+            background: #222;
+            border-radius: 5px;
+        }
+        
+        .cipher-text.blink {
+            animation: blink 1s infinite;
+        }
+        
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .input-container {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            justify-content: center;
+        }
+        
+        input {
+            flex-grow: 1;
+            max-width: 400px;
+            background: #222;
+            border: 1px solid #00ff00;
+            color: #00ff00;
+            padding: 10px 15px;
+            font-size: 1.1rem;
+            border-radius: 5px;
+        }
+        
+        input:focus {
+            outline: none;
+            box-shadow: 0 0 10px #00ff00;
+        }
+        
+        button {
+            background: #003300;
+            color: #00ff00;
+            border: 1px solid #00ff00;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        
+        button:hover {
+            background: #005500;
+            box-shadow: 0 0 10px #00ff00;
+        }
+        
+        .hint {
+            margin-top: 15px;
+            color: #ffff55;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        #nextClue {
+            margin-top: 30px;
+            text-align: center;
+        }
+        
+        #secretCode {
+            font-family: monospace;
+            font-size: 1.3rem;
+            color: #ff55ff;
+            background: #222;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🔓 LAYER 1: THE CAESAR CIPHER</h1>
+        <p>Neural Access Level: 1 | User: Initiate</p>
+    </div>
+    
+    <div class="terminal">
+        <div class="terminal-line system">> SYSTEM: First encryption layer detected</div>
+        <div class="terminal-line system">> CIPHER TYPE: Caesar Shift (ROT13 variant)</div>
+        <div class="terminal-line">> ENCRYPTED MESSAGE:</div>
+    </div>
+    
+    <div class="puzzle-container">
+        <h2>📜 DECRYPT THIS MESSAGE:</h2>
+        
+        <div class="cipher-text blink" id="cipherText">
+            URYYB JBEYQ
+        </div>
+        
+        <p>The cipher shifts each letter by 13 positions:</p>
+        <p>A ↔ N, B ↔ O, C ↔ P, etc.</p>
+        
+        <div class="input-container">
+            <input type="text" id="answerInput" placeholder="Enter decrypted text...">
+            <button id="submitBtn">DECRYPT</button>
+        </div>
+        
+        <div class="hint">
+            💡 Hint: "Hello" would be "URYYB" in this cipher
+        </div>
+        
+        <div id="result" class="hidden">
+            <!-- Result will appear here -->
+        </div>
+    </div>
+    
+    <div id="nextClue" class="hidden">
+        <h2>✅ PUZZLE SOLVED!</h2>
+        <div class="terminal-line success">> CIPHER BROKEN: Accessing next layer...</div>
+        
+        <p>Your secret code for Layer 2:</p>
+        <div id="secretCode">NEURO-ARG-2024-ALPHA</div>
+        
+        <p>Save this code! You'll need it later.</p>
+        <button onclick="copyCode()">📋 Copy Code</button>
+        <button onclick="continueToLayer2()">➡️ Continue to Layer 2</button>
+    </div>
+    
+    <script>
+        // Caesar cipher ROT13 decoder
+        function rot13(str) {
+            return str.replace(/[A-Z]/g, (char) => {
+                const code = char.charCodeAt(0);
+                return String.fromCharCode(((code - 65 + 13) % 26) + 65);
+            });
+        }
+        
+        // The correct answer (hidden from source)
+        const correctAnswer = rot13("URYYB JBEYQ"); // "HELLO WORLD"
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const input = document.getElementById('answerInput');
+            const submitBtn = document.getElementById('submitBtn');
+            const resultDiv = document.getElementById('result');
+            const nextClueDiv = document.getElementById('nextClue');
+            const cipherText = document.getElementById('cipherText');
+            
+            // Animate cipher text
+            let text = "URYYB JBEYQ";
+            let index = 0;
+            
+            function animateCipher() {
+                if (index < text.length) {
+                    cipherText.textContent = text.substring(0, index + 1);
+                    index++;
+                    setTimeout(animateCipher, 100);
+                } else {
+                    cipherText.classList.remove('blink');
+                }
+            }
+            
+            // Start animation after delay
+            setTimeout(animateCipher, 1000);
+            
+            // Submit answer
+            submitBtn.addEventListener('click', checkAnswer);
+            input.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') checkAnswer();
+            });
+            
+            function checkAnswer() {
+                const userAnswer = input.value.trim().toUpperCase();
+                
+                if (userAnswer === correctAnswer) {
+                    // Success!
+                    resultDiv.innerHTML = `
+                        <div class="terminal-line success">
+                            > CORRECT! Decryption successful
+                        </div>
+                        <div class="terminal-line">
+                            > Original: "URYYB JBEYQ"
+                        </div>
+                        <div class="terminal-line success">
+                            > Decrypted: "${correctAnswer}"
+                        </div>
+                    `;
+                    resultDiv.classList.remove('hidden');
+                    
+                    // Show next clue after delay
+                    setTimeout(() => {
+                        nextClueDiv.classList.remove('hidden');
+                        document.querySelector('.puzzle-container').style.borderColor = '#55ff55';
+                    }, 1500);
+                    
+                } else {
+                    // Wrong answer
+                    resultDiv.innerHTML = `
+                        <div class="terminal-line" style="color: #ff5555;">
+                            > ERROR: Decryption failed
+                        </div>
+                        <div class="terminal-line">
+                            > Attempt: "${userAnswer}"
+                        </div>
+                        <div class="terminal-line">
+                            > Expected: "${correctAnswer}"
+                        </div>
+                    `;
+                    resultDiv.classList.remove('hidden');
+                    
+                    // Clear after 3 seconds
+                    setTimeout(() => {
+                        resultDiv.classList.add('hidden');
+                        resultDiv.innerHTML = '';
+                        input.value = '';
+                        input.focus();
+                    }, 3000);
+                }
+            }
+            
+            // Add terminal logs
+            setTimeout(() => {
+                const terminal = document.querySelector('.terminal');
+                const line = document.createElement('div');
+                line.className = 'terminal-line';
+                line.textContent = '> Awaiting user decryption...';
+                terminal.appendChild(line);
+            }, 2000);
+        });
+        
+        function copyCode() {
+            const code = document.getElementById('secretCode').textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                alert('Code copied to clipboard!');
+            });
+        }
+        
+        function continueToLayer2() {
+    // Get the secret code
+    const code = document.getElementById('secretCode').textContent;
+    
+    // Save to localStorage
+    localStorage.setItem('neuroArgCode', code);
+    
+    // Redirect to Layer 2 with code as parameter
+    window.location.href = 'layer2.html?code=' + encodeURIComponent(code);
+}
+    </script>
+</body>
+</html>

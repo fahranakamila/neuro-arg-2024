@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEURO-GATE | ACCESS REQUIRED</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Courier New', monospace;
+        }
+        
+        body {
+            background: #0a0a0a;
+            color: #00ff00;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .container {
+            text-align: center;
+            padding: 2rem;
+            border: 1px solid #00ff00;
+            border-radius: 10px;
+            box-shadow: 0 0 30px rgba(0, 255, 0, 0.3);
+            max-width: 800px;
+            width: 90%;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            text-shadow: 0 0 10px #00ff00;
+        }
+        
+        .status {
+            font-size: 1.2rem;
+            margin: 2rem 0;
+            color: #ff5555;
+        }
+        
+        .scanner {
+            width: 300px;
+            height: 150px;
+            margin: 2rem auto;
+            background: linear-gradient(90deg, 
+                #002200 0%, 
+                #00ff00 50%, 
+                #002200 100%);
+            border-radius: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .scan-line {
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            background: #ffffff;
+            top: 0;
+            animation: scan 2s linear infinite;
+            box-shadow: 0 0 10px #fff;
+        }
+        
+        @keyframes scan {
+            0% { top: 0; }
+            100% { top: 100%; }
+        }
+        
+        .progress-container {
+            width: 100%;
+            height: 20px;
+            background: #111;
+            border: 1px solid #00ff00;
+            border-radius: 10px;
+            margin: 2rem 0;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #00aa00, #00ff00);
+            width: 0%;
+            transition: width 0.3s;
+        }
+        
+        button {
+            background: #003300;
+            color: #00ff00;
+            border: 1px solid #00ff00;
+            padding: 1rem 2rem;
+            font-size: 1.2rem;
+            cursor: pointer;
+            margin-top: 1rem;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+        
+        button:hover {
+            background: #005500;
+            box-shadow: 0 0 15px #00ff00;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        #console {
+            text-align: left;
+            background: #111;
+            padding: 1rem;
+            border: 1px solid #333;
+            margin-top: 2rem;
+            height: 150px;
+            overflow-y: auto;
+            font-size: 0.9rem;
+        }
+        
+        .console-line {
+            margin: 5px 0;
+            color: #00ff00;
+        }
+        
+        .console-line.system {
+            color: #5555ff;
+        }
+        
+        .console-line.success {
+            color: #55ff55;
+        }
+        
+        .console-line.error {
+            color: #ff5555;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔒 NEURO-GATE ACCESS</h1>
+        <p>Neural signature verification required</p>
+        
+        <div class="scanner">
+            <div class="scan-line"></div>
+        </div>
+        
+        <div class="status" id="status">
+            ❌ ACCESS DENIED - Neural focus required
+        </div>
+        
+        <div class="progress-container">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+        
+        <button id="startBtn">🧠 BEGIN NEURAL SCAN</button>
+        <button id="webcamBtn" class="hidden">📷 ENABLE WEBCAM (Alternative)</button>
+        
+        <div id="console">
+            <div class="console-line system">> SYSTEM: Neuro-scanner initialized</div>
+            <div class="console-line">> USER: Unknown</div>
+            <div class="console-line">> ACCESS: Level 0</div>
+            <div class="console-line">> TIME: <span id="time">--:--:--</span></div>
+        </div>
+    </div>
+    
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const startBtn = document.getElementById('startBtn');
+        const status = document.getElementById('status');
+        const progressBar = document.getElementById('progressBar');
+        const consoleElement = document.getElementById('console');
+        const timeElement = document.getElementById('time');
+        
+        // Update waktu
+        function updateTime() {
+            const now = new Date();
+            timeElement.textContent = now.toLocaleTimeString();
+        }
+        setInterval(updateTime, 1000);
+        updateTime();
+        
+        // Add console log
+        function addConsoleLog(message, type = '') {
+            const line = document.createElement('div');
+            line.className = `console-line ${type}`;
+            line.textContent = `> ${message}`;
+            consoleElement.appendChild(line);
+            consoleElement.scrollTop = consoleElement.scrollHeight;
+        }
+        
+        // Scan simulation
+        startBtn.addEventListener('click', function() {
+            if (this.dataset.scanning === 'true') return;
+            
+            this.dataset.scanning = 'true';
+            this.disabled = true;
+            this.textContent = 'SCANNING...';
+            status.textContent = '🔄 Scanning neural patterns...';
+            status.style.color = '#ffff55';
+            
+            addConsoleLog('Starting neural scan...', 'system');
+            
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += Math.random() * 3;
+                if (progress > 100) progress = 100;
+                
+                progressBar.style.width = progress + '%';
+                
+                // Random system messages
+                if (progress > 25 && progress < 30) {
+                    addConsoleLog('Detecting alpha waves...', 'system');
+                }
+                if (progress > 50 && progress < 55) {
+                    addConsoleLog('Theta patterns identified', 'system');
+                }
+                if (progress > 75 && progress < 80) {
+                    addConsoleLog('Gamma synchronization detected', 'system');
+                }
+                
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    status.innerHTML = '✅ ACCESS GRANTED - Welcome, Initiate';
+                    status.style.color = '#55ff55';
+                    startBtn.textContent = 'ENTER NEURO-GATE';
+                    
+                    addConsoleLog('Neural signature verified', 'success');
+                    addConsoleLog('Access level upgraded to 1', 'success');
+                    addConsoleLog('Decrypting first layer...', 'system');
+                    
+                    // ⭐⭐ FIX INI ⭐⭐
+                    // Enable next step
+                    startBtn.disabled = false;
+                    startBtn.dataset.scanning = 'false';
+                    
+                    // GANTI TOMBOL BIAR BISA DIKLIK
+                    startBtn.setAttribute('onclick', "window.location.href='layer1.html'");
+                }
+            }, 100);
+        });
+        
+        // Initial console logs
+        setTimeout(() => {
+            addConsoleLog('System ready for authentication', 'system');
+        }, 1000);
+        
+        setTimeout(() => {
+            addConsoleLog('Awaiting user initiation...', 'system');
+        }, 2000);
+    });
+</script>
+</body>
+</html>
